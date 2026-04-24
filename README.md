@@ -68,7 +68,7 @@ merge to main → Fine-tune model → Push to HF Hub → Deploy to HF Spaces
 
 ```bash
 # Clone and install
-git clone https://github.com/YOUR_USERNAME/mlops-llm-cicd
+https://github.com/26vyshnavi/mlops-llm-cicd
 cd mlops-llm-cicd
 pip install -e .
 pip install -r requirements-dev.txt
