@@ -1,7 +1,5 @@
 # src package
-# Note: heavy imports (transformers, torch) are NOT imported here.
-# Import them directly in the modules that need them to keep the package
-# lightweight at collection time (faster pytest startup, smaller imports).
-from src.config import TrainingConfig, InferenceConfig
+# FIX I001: imports sorted alphabetically within the same from-import
+from src.config import InferenceConfig, TrainingConfig
 
-__all__ = ["TrainingConfig", "InferenceConfig"]
+__all__ = ["InferenceConfig", "TrainingConfig"]

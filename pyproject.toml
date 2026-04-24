@@ -1,14 +1,3 @@
-# pyproject.toml — Modern Python project configuration (PEP 517/518/621).
-#
-# WHY pyproject.toml instead of setup.py?
-#   pyproject.toml is the modern standard (PEP 517). It:
-#     - Combines build config, tool config, and project metadata in one file
-#     - Is read by pip, pytest, ruff, mypy — no more setup.cfg juggling
-#     - Makes the project installable with: pip install -e .
-#
-# Running `pip install -e .` (editable install) lets Python find `src` and `app`
-# as packages without needing PYTHONPATH hacks.
-
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -21,20 +10,19 @@ requires-python = ">=3.10"
 readme = "README.md"
 
 # ── Ruff configuration ────────────────────────────────────────────────────────
-# ruff is a drop-in replacement for flake8 + isort, written in Rust.
-# It checks ~700 lint rules and auto-fixes many of them.
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py310"
 
 [tool.ruff.lint]
 # E/W = pycodestyle, F = pyflakes, I = isort
 select = ["E", "F", "W", "I"]
-# E501 = line too long (handled by formatter, not linter)
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
-# Tests can have longer lines and unused imports (for mock fixtures etc.)
+# conftest.py: sys.modules stubs must run before `import pytest` — E402 is intentional.
+"tests/conftest.py" = ["E402"]
+# Test files: F811 (redefinition) is fine in tests for fixture overrides.
 "tests/**/*.py" = ["E501", "F811"]
 
 # ── Pytest configuration ──────────────────────────────────────────────────────
@@ -43,11 +31,6 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-
-# -v: verbose output (show each test name)
-# --tb=short: shorter tracebacks on failure
-# --cov: measure coverage for the src/ package
-# --cov-report: show missing lines in terminal and write XML for CI upload
 addopts = [
     "-v",
     "--tb=short",
@@ -57,12 +40,11 @@ addopts = [
     "--cov-report=xml:coverage.xml",
 ]
 
-# ── Coverage configuration ────────────────────────────────────────────────────
+# ── Coverage ──────────────────────────────────────────────────────────────────
 [tool.coverage.run]
 source = ["src", "app"]
 omit = ["tests/*", "*/__init__.py"]
 
 [tool.coverage.report]
-# Fail the CI if coverage drops below this threshold
 fail_under = 70
 show_missing = true
