@@ -1,0 +1,15 @@
+# Dev dependencies — not installed in the Docker image (only in CI and locally).
+# Install with: pip install -r requirements-dev.txt
+
+# Inherit all production deps
+-r requirements.txt
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest>=8.1.0           # Test runner
+pytest-cov>=5.0.0       # Code coverage measurement
+pytest-mock>=3.12.0     # Syntactic sugar for unittest.mock
+
+# ── Linting & formatting ──────────────────────────────────────────────────────
+# ruff replaces: flake8, isort, pyupgrade, pep8, bandit (partially)
+# It is 10-100x faster than flake8 because it's written in Rust.
+ruff>=0.4.0

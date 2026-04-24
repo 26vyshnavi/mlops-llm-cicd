@@ -1,0 +1,16 @@
+# ── Core ML ──────────────────────────────────────────────────────────────────
+# PyTorch CPU-only build: smaller image, no CUDA dependency.
+# For GPU, replace with: torch>=2.2.0 (and add --index-url for CUDA wheels).
+torch>=2.2.0
+
+# HuggingFace ecosystem
+transformers>=4.40.0   # Model loading, Trainer, AutoTokenizer, AutoModel
+datasets>=2.18.0       # load_dataset, DatasetDict, Dataset
+accelerate>=0.29.0     # Trainer backend for device placement & mixed precision
+huggingface-hub>=0.22.0  # push_to_hub, login, HfApi
+
+# ── Evaluation ───────────────────────────────────────────────────────────────
+rouge-score>=0.1.2     # ROUGE-1/2/L metrics for summarization evaluation
+
+# ── Web interface ─────────────────────────────────────────────────────────────
+gradio>=4.20.0         # Gradio web UI (also the HF Spaces SDK)

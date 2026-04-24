@@ -1,0 +1,150 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# ci.yml — Continuous Integration: Lint → Test → Docker Build
+#
+# WHAT IS CI?
+#   Continuous Integration means every code change (push or PR) automatically
+#   triggers a pipeline that catches problems early:
+#     1. LINT:    Does the code follow style rules? (fast, < 30s)
+#     2. TEST:    Do all unit tests pass? (fast because we mock the model)
+#     3. BUILD:   Does the Docker image build without errors? (slow, ~3 min)
+#
+# WHY THREE SEPARATE JOBS?
+#   Each job runs in an independent VM. 'needs:' creates dependencies between
+#   them (lint must pass before tests run; tests must pass before Docker build).
+#   This way the fastest checks run first, failing early before wasting time.
+#
+# TRIGGERS:
+#   - Every push to any branch (catches issues before PR review)
+#   - Every pull request targeting main (gate before merge)
+#
+# KEY CONCEPTS:
+#   actions/checkout@v4      : Clone the repo into the runner VM
+#   actions/setup-python@v5  : Install Python + configure pip cache
+#   cache: pip               : Cache ~/.cache/pip between runs → 2x faster installs
+#   docker/setup-buildx@v3   : Enable BuildKit (faster builds, layer caching)
+#   docker/build-push@v5     : Build (and optionally push) Docker images
+#   type=gha cache           : GitHub Actions layer cache for Docker (free!)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: CI — Lint · Test · Build
+
+on:
+  push:
+    branches: ["**"]           # All branches
+  pull_request:
+    branches: ["main"]         # PRs targeting main only
+
+# Cancel any in-progress run for the same branch when a new push arrives.
+# Prevents queue buildup when you push multiple commits quickly.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ── Job 1: Lint ──────────────────────────────────────────────────────────────
+  lint:
+    name: "🔍 Lint (ruff)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        # We install ruff alone (not all dev deps) to keep this job fast.
+        # ruff is ~2 MB and installs in 2 seconds.
+        run: pip install ruff>=0.4.0
+
+      - name: Run ruff linter
+        # ruff check: finds lint errors (undefined vars, unused imports, etc.)
+        # ruff format --check: verifies code is formatted (fails if not, but doesn't fix)
+        run: |
+          ruff check . --output-format=github
+          ruff format --check .
+
+  # ── Job 2: Test ──────────────────────────────────────────────────────────────
+  test:
+    name: "🧪 Unit Tests (pytest)"
+    runs-on: ubuntu-latest
+    needs: lint          # Only run if lint passes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip           # Cache pip downloads between runs
+
+      - name: Install dev dependencies
+        # -e . installs the project in editable mode so `from src.X` imports work
+        run: |
+          pip install -e .
+          pip install -r requirements-dev.txt
+
+      - name: Run tests with coverage
+        # The pytest config in pyproject.toml handles all flags.
+        # We just need to make sure the test command is called.
+        run: pytest
+
+      - name: Upload coverage report to Codecov
+        # Codecov shows a coverage badge and PR comments with coverage diff.
+        # This step is optional — it won't fail CI if the upload fails.
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+      - name: Upload coverage as artifact
+        # Also upload as a GitHub artifact so you can download it from the UI.
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 7
+
+  # ── Job 3: Docker Build ──────────────────────────────────────────────────────
+  docker-build:
+    name: "🐳 Docker Build"
+    runs-on: ubuntu-latest
+    needs: test          # Only build if tests pass
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        # Buildx enables BuildKit: parallel layer building, inline caching,
+        # multi-platform builds (linux/amd64 + linux/arm64).
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false          # Don't push to any registry in CI (only in CD)
+          tags: |
+            llm-summarizer:ci-${{ github.sha }}
+            llm-summarizer:latest
+          # ── Layer caching ──────────────────────────────────────────────────
+          # GitHub Actions Cache stores Docker layers between runs.
+          # First build: ~4 minutes. Subsequent builds (code-only change): ~45s.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summarise build
+        # Print a human-readable summary of what was built.
+        run: |
+          echo "### 🐳 Docker Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Image tag: \`llm-summarizer:ci-${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
