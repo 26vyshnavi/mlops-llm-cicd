@@ -44,14 +44,13 @@ def train(config: Optional[TrainingConfig] = None) -> Tuple[PreTrainedModel, Pre
         per_device_train_batch_size=config.batch_size,
         per_device_eval_batch_size=config.batch_size,
         learning_rate=config.learning_rate,
-        warmup_ratio=0.05,
+        warmup_steps=50,
         lr_scheduler_type="cosine",
         eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
-        logging_dir=os.path.join(config.output_dir, "logs"),
         logging_steps=50,
         report_to="none",
         dataloader_num_workers=0,
@@ -63,7 +62,7 @@ def train(config: Optional[TrainingConfig] = None) -> Tuple[PreTrainedModel, Pre
         train_dataset=dataset["train"],
         eval_dataset=dataset["test"],
         data_collator=data_collator,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
     )
 
     print("\nStarting training...")
