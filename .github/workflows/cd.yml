@@ -97,6 +97,7 @@ jobs:
       - name: Fine-tune DistilGPT-2
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
           # workflow_dispatch input takes priority; falls back to default 500
           DATASET_SIZE: ${{ github.event.inputs.dataset_size || '500' }}
           NUM_EPOCHS: ${{ github.event.inputs.num_epochs || '1' }}
