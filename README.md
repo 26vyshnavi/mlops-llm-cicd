@@ -1,3 +1,12 @@
+---
+title: DistilGPT-2 Summarizer
+emoji: 📰
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # MLOps CI/CD Pipeline for LLMs
 
 > Fine-tuned **DistilGPT-2** for text summarization, with a full MLOps pipeline:
