@@ -1,12 +1,3 @@
----
-title: DistilGPT-2 Summarizer
-emoji: 📰
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
----
-
 # MLOps CI/CD Pipeline for LLMs
 
 > Fine-tuned **DistilGPT-2** for text summarization, with a full MLOps pipeline:
@@ -118,14 +109,14 @@ Add these at **Settings → Secrets and variables → Actions**:
 - **Lazy model loading** — app starts fast; model loads on first request
 - **ROUGE evaluation** — automatic quality measurement in the CD pipeline
 
-## ROUGE Scores (expected)
+## ROUGE Scores
 
 After fine-tuning on 500 XSum samples for 1 epoch (CI demo config):
 
 | Metric | Score |
 |--------|-------|
-| ROUGE-1 | ~0.18–0.25 |
-| ROUGE-2 | ~0.06–0.12 |
-| ROUGE-L | ~0.15–0.22 |
+| ROUGE-1 | 0.1798 |
+| ROUGE-2 | 0.0282 |
+| ROUGE-L | 0.1306 |
 
 Full fine-tuning (200k samples, 3 epochs, GPU) would push ROUGE-2 to ~0.12–0.16.
