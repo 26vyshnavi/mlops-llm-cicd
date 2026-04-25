@@ -4,6 +4,10 @@ app.py — Gradio web interface for the fine-tuned summarization model.
 
 # FIX I001: stdlib imports first, then third-party, then local
 import os
+import sys
+
+# Ensure the repo root (/app) is on sys.path so `src` can be found
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import gradio as gr
 
