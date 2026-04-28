@@ -1,12 +1,3 @@
----
-title: DistilGPT-2 Summarizer
-emoji: 📰
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
----
-
 # MLOps CI/CD Pipeline for LLMs
 
 > Fine-tuned **DistilGPT-2** for text summarization, with a full MLOps pipeline:
@@ -68,7 +59,7 @@ merge to main → Fine-tune model → Push to HF Hub → Deploy to HF Spaces
 
 ```bash
 # Clone and install
-https://github.com/26vyshnavi/mlops-llm-cicd
+git clone https://github.com/26vyshnavi/mlops-llm-cicd
 cd mlops-llm-cicd
 pip install -e .
 pip install -r requirements-dev.txt
