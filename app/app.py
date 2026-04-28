@@ -63,8 +63,6 @@ demo = gr.Interface(
             80,
         ],
     ],
-    theme=gr.themes.Soft(),
-    allow_flagging="never",
 )
 
 
