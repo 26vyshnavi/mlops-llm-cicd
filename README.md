@@ -120,3 +120,10 @@ After fine-tuning on 500 XSum samples for 1 epoch (CI demo config):
 | ROUGE-L | 0.1306 |
 
 Full fine-tuning (200k samples, 3 epochs, GPU) would push ROUGE-2 to ~0.12–0.16.
+
+## Links
+- 🤗 **Live Demo**: [HuggingFace Space](https://huggingface.co/spaces/Vyk223/Mlops-llm-cicd)
+- 💻 **GitHub Repo**: [26vyshnavi/mlops-llm-cicd](https://github.com/26vyshnavi/mlops-llm-cicd)
+
+<img width="1283" height="834" alt="Screenshot 2026-04-27 at 11 49 31 PM" src="https://github.com/user-attachments/assets/c1bcefa4-f1b0-4127-b118-f70687fdb034" />
+
