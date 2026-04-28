@@ -5,6 +5,7 @@ app.py — Gradio web interface for the fine-tuned summarization model.
 # FIX I001: stdlib imports first, then third-party, then local
 import os
 import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import gradio as gr
@@ -45,7 +46,7 @@ demo = gr.Interface(
         ),
         gr.Slider(minimum=30, maximum=200, value=80, step=10, label="Max Summary Length (tokens)"),
     ],
-    outputs=gr.Textbox(label="Generated Summary"),   
+    outputs=gr.Textbox(label="Generated Summary"),
     title="📰 DistilGPT-2 Summarizer",
     description=(
         "Fine-tuned **DistilGPT-2** on XSum for single-sentence news summarization. "
